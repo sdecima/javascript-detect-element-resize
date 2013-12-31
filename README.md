@@ -52,19 +52,31 @@ Works great on:
 
  - Chrome
  - Firefox
- - IE 9
+ - IE 10 and below
 
 Doesn't work on:
 
- - IE 7
- - IE 8
+ - IE 11
 
 TODO
 ====
 
  - Create minified version of the libraries.
- - Add support to IE7/8 (totally feasible, just need to update the code and test it properly).
+ - Add support to IE11.
  - Add support for standard jQuery bind method on 'resize' event.
+
+Release Notes
+=============
+v0.2
+----
+
+ - Adds support for IE 8 and below.
+
+v0.1
+----
+
+ - Implementation based on the [works][1] of [Back Alley Coder][3]
+ - Adds jQuery plugin version
 
 
 References

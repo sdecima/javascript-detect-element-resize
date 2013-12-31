@@ -1,11 +1,10 @@
 /**
-* Detect Element Rezise
+* Detect Element Resize
 *
 * https://github.com/sdecima/javascript-detect-element-resize
 * Sebastian Decima
 *
-* Based on the works of Back Alley Coder:
-*  http://www.backalleycoder.com/2013/03/18/cross-browser-event-based-element-resize-detection/
+* version: 0.2
 **/
 
 function addFlowListener(element, type, fn){
@@ -74,17 +73,17 @@ function addResizeListener(element, fn){
 		matchFlow({});
 	}
 	var events = element._flowEvents || (element._flowEvents = []);
-	if (events.indexOf(fn) == -1) events.push(fn);
+	if (indexOf.call(events, fn) == -1) events.push(fn);
 	if (!resize) element.addEventListener('resize', fn, false);
 	element.onresize = function(e){
-		events.forEach(function(fn){
+		forEach.call(events, function(fn){
 			fn.call(element, e);
 		});
 	};
 };
 
 function removeResizeListener(element, fn){
-	var index = element._flowEvents.indexOf(fn);
+	var index = indexOf.call(element._flowEvents, fn);
 	if (index > -1) element._flowEvents.splice(index, 1);
 	if (!element._flowEvents.length) {
 		var sensor = element._resizeSensor;
@@ -97,4 +96,41 @@ function removeResizeListener(element, fn){
 		delete element._flowEvents;
 	}
 	element.removeEventListener('resize', fn);
+};
+
+/* Array.indexOf for IE < 9 */
+var indexOf = function(needle) {
+    if(typeof Array.prototype.indexOf === 'function') {
+        indexOf = Array.prototype.indexOf;
+    } else {
+        indexOf = function(needle) {
+            var i = -1, index = -1;
+
+            for(i = 0; i < this.length; i++) {
+                if(this[i] === needle) {
+                    index = i;
+                    break;
+                }
+            }
+
+            return index;
+        };
+    }
+
+    return indexOf.call(this, needle);
+};
+
+/* Array.forEach for IE < 9 */
+var forEach = function(action, that) {
+    if(typeof Array.prototype.forEach === 'function') {
+        forEach = Array.prototype.forEach;
+    } else {
+        forEach = function(action, that) {
+        for (var i= 0, n= this.length; i<n; i++)
+            if (i in this)
+                action.call(that, this[i], i, this);
+        };
+    }
+
+    return forEach.call(this, action, that);
 };

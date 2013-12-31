@@ -1,11 +1,10 @@
 /**
-* Detect Element Rezise Plugin for jQuery
+* Detect Element Resize Plugin for jQuery
 *
 * https://github.com/sdecima/javascript-detect-element-resize
 * Sebastian Decima
 *
-* Based on the works of Back Alley Coder:
-*  http://www.backalleycoder.com/2013/03/18/cross-browser-event-based-element-resize-detection/
+* version: 0.2
 **/
 
 (function ( $ ) {
@@ -87,17 +86,17 @@
 			matchFlow({});
 		}
 		var events = element._flowEvents || (element._flowEvents = []);
-		if (events.indexOf(fn) == -1) events.push(fn);
+		if ($.inArray(fn,events) == -1) events.push(fn);
 		if (!resize) element.addEventListener('resize', fn, false);
 		element.onresize = function(e){
-			events.forEach(function(fn){
+			$.each(events, function(index, fn){
 				fn.call(element, e);
 			});
 		};
 	};
 	
 	function removeResizeListener(element, fn){
-		var index = element._flowEvents.indexOf(fn);
+		var index = $.inArray(fn, element._flowEvents);
 		if (index > -1) element._flowEvents.splice(index, 1);
 		if (!element._flowEvents.length) {
 			var sensor = element._resizeSensor;
