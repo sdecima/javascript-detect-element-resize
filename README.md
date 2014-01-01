@@ -3,7 +3,8 @@ javascript-detect-element-resize
 
 A Cross-Browser, Event-based, Element Resize Detection.
 
-In short, this implementation does NOT use an internal timer to detect size changes (as most implementations I found).
+In short, this implementation does NOT use an internal timer to detect size changes (as most implementations I found do).
+It uses [MutationObservers][4] if supported by the browser, and [overflow and underflow events][2] if not. It also uses the ['onresize' event][5] on IE10 and below.
 
 About the libraries
 ===================
@@ -14,7 +15,9 @@ I was searching for a library that allowed me to detect when an DOM element chan
 
 Then I came across this [great post][1] on [Back Alley Coder][3] about using [overflow and underflow events][2] to do event-based element resize detection; and it works great without consuming resources at all (just like any other browser originated event).
 
-The libraries on this repository are just a concrete implementation of that technique.
+On the other hand, most new browsers implement [WC3 DOM4 MutationObservers][4], which allows to observe property changes and hence indirectly watch for resize changes.
+
+The libraries on this repository are just a concrete implementation of a mixture of the above technologies/techniques.
 
 Libraries
 =========
@@ -40,9 +43,12 @@ jQuery plugin library usage
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="jquery.resize.js"></script>
 <script type="text/javascript">
-  $('#resizeElement').resize(function() {
+  var myFunc = function() {
     /* do something */
-  });
+  };
+  
+  $('#resizeElement').resize(myFunc);
+  $('#resizeElement').removeResize(myFunc);
 </script>
 ```
 
@@ -67,6 +73,13 @@ TODO
 
 Release Notes
 =============
+v0.3
+----
+
+ - Adds support for MutationObservers.
+ - Adds support for IE 11.
+ - Wrapped the pure javascript version of the library (to hide non-public methods).
+
 v0.2
 ----
 
@@ -99,3 +112,5 @@ External links
 [1]: http://www.backalleycoder.com/2013/03/18/cross-browser-event-based-element-resize-detection/
 [2]: http://www.backalleycoder.com/2013/03/14/oft-overlooked-overflow-and-underflow-events/
 [3]: http://www.backalleycoder.com/
+[4]: http://www.w3.org/TR/dom/#mutation-observers
+[5]: http://msdn.microsoft.com/en-us/library/ie/ms536959
