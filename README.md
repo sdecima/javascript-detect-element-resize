@@ -68,7 +68,6 @@ TODO
 ====
 
  - Create minified version of the libraries.
- - Add support to IE11.
  - Add support for standard jQuery bind method on 'resize' event.
 
 Release Notes
