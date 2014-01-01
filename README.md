@@ -58,11 +58,11 @@ Works great on:
 
  - Chrome
  - Firefox
- - IE 10 and below
+ - IE 11 and below (tested on 11, 10, 9, 8 and 7)
 
 Doesn't work on:
 
- - IE 11
+ - ???
 
 TODO
 ====
