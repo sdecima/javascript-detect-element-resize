@@ -4,10 +4,13 @@
 * https://github.com/sdecima/javascript-detect-element-resize
 * Sebastian Decima
 *
-* version: 0.3
+* version: 0.4
 **/
 
 (function ( $ ) {
+	var is_above_ie10 = !(window.ActiveXObject) && "ActiveXObject" in window;
+	var supports_mutation_observer = 'MutationObserver' in window;
+
 	$.fn.resize = function(callback) {
 		return this.each(function() {
 			addResizeListener(this, callback);
@@ -70,13 +73,13 @@
     };
 	
 	function addResizeListener(element, fn){
-		if ('MutationObserver' in window) {
+		if (is_above_ie10 && supports_mutation_observer) {
 			fn._mutationObserver = addResizeMutationObserver(element, fn);
 			var events = element._mutationObservers || (element._mutationObservers = []);
 			if ($.inArray(fn, events) == -1) events.push(fn);
 		} else {
-			var resize = 'onresize' in element;
-			if (!resize && !element._resizeSensor) {
+			var supports_onresize = 'onresize' in element;
+			if (!supports_onresize && !element._resizeSensor) {
 				var sensor_style = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: -1;';
 				var sensor = element._resizeSensor = document.createElement('div');
 					sensor.className = 'resize-sensor';
@@ -119,7 +122,7 @@
 			}
 			var events = element._flowEvents || (element._flowEvents = []);
 			if ($.inArray(fn,events) == -1) events.push(fn);
-			if (!resize) element.addEventListener('resize', fn, false);
+			if (!supports_onresize) element.addEventListener('resize', fn, false);
 			element.onresize = function(e){
 				$.each(events, function(index, fn){
 					fn.call(element, e);
@@ -129,7 +132,7 @@
 	};
 	
 	function removeResizeListener(element, fn){
-		if ('MutationObserver' in window) {
+		if (is_above_ie10 && supports_mutation_observer) {
 			var index = $.inArray(fn, element._mutationObservers);
 			if (index > -1) {
 				var observer = element._mutationObservers[index]._mutationObserver;
@@ -137,7 +140,7 @@
 				observer.disconnect();
 			}
 		} else {
-			var resize = 'onresize' in element;
+			var supports_onresize = 'onresize' in element;
 			var index = $.inArray(fn, element._flowEvents);
 			if (index > -1) element._flowEvents.splice(index, 1);
 			if (!element._flowEvents.length) {
@@ -147,10 +150,10 @@
 					if (sensor._resetPosition) element.style.position = 'static';
 					try { delete element._resizeSensor; } catch(e) { /* delete arrays not supported on IE 7 and below */}
 				}
-				if (resize) element.onresize = null;
+				if (supports_onresize) element.onresize = null;
 				try { delete element._flowEvents; } catch(e) { /* delete arrays not supported on IE 7 and below */}
 			}
-			if(!resize) element.removeEventListener('resize', fn);
+			if(!supports_onresize) element.removeEventListener('resize', fn);
 		}
 	};
 	

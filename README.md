@@ -58,11 +58,18 @@ Works great on:
 
  - Chrome
  - Firefox
- - IE 11 and below (tested on 11, 10, 9, 8 and 7)
+ - IE 10 and below (tested on 10, 9, 8 and 7)
+
+Works but limited:
+
+ - IE 11: due to lack of onresize/overflow events, it only detects changes through a MutationObserver;  
+   i.e. only javascript generated resize changes and not CSS pseudo classes e.g. :hover, CSS animations, etc.
 
 Doesn't work on:
 
  - ???
+
+Please [let me know](https://github.com/sdecima/javascript-detect-element-resize/issues) if you test these libraries on any other browser, of if you run into issues with any of the above browsers.
 
 TODO
 ====
@@ -72,6 +79,11 @@ TODO
 
 Release Notes
 =============
+v0.4
+----
+
+ - Adds better cross-browser support, it now uses MutationObservers only on IE11.
+
 v0.3
 ----
 
