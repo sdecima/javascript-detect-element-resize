@@ -35,7 +35,7 @@
 			}
 		}
 	}
-	
+
 	function addResizeMutationObserver(element, fn){
 		var observer = new MutationObserver(newResizeMutationObserverCallback(element, fn));
 		observer.observe(element, {
@@ -146,18 +146,15 @@
 		} else {
 			indexOf = function(needle) {
 				var i = -1, index = -1;
-
 				for(i = 0; i < this.length; i++) {
 					if(this[i] === needle) {
 						index = i;
 						break;
 					}
 				}
-
 				return index;
 			};
 		}
-
 		return indexOf.call(this, needle);
 	};
 
@@ -172,10 +169,9 @@
 					action.call(that, this[i], i, this);
 			};
 		}
-
 		return forEach.call(this, action, that);
 	};
-	
+
 	window.addResizeListener = addResizeListener;
 	window.removeResizeListener = removeResizeListener;
 }());

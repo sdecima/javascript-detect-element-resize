@@ -16,19 +16,19 @@
 			addResizeListener(this, callback);
 		});
 	}
-	
+
 	$.fn.removeResize = function(callback) {
 		return this.each(function() {
 			removeResizeListener(this, callback);
 		});
 	}
-	
+
 	$.fn.flow = function(type, callback) {
 		return this.each(function() {
 			addFlowListener(this, type, callback);
 		});
 	}
-	
+
 	function addFlowListener(element, type, fn){
 		var flow = type == 'over';
 		element.addEventListener('OverflowEvent' in window ? 'overflowchanged' : type + 'flow', function(e){
@@ -41,7 +41,7 @@
 			}
 		}, false);
 	};
-	
+
 	function newResizeMutationObserverCallback(element, fn) {
 		var oldWidth = element.clientWidth,
 			oldHeight = element.clientHeight;
@@ -53,7 +53,7 @@
 			}
 		}
 	}
-	
+
 	function addResizeMutationObserver(element, fn){
 		var observer = new MutationObserver(newResizeMutationObserverCallback(element, fn));
 		observer.observe(element, {
@@ -71,7 +71,7 @@
 		for (var z in data) event[z] = data[z];
 		element.dispatchEvent(event);
     };
-	
+
 	function addResizeListener(element, fn){
 		if (is_above_ie10 && supports_mutation_observer) {
 			fn._mutationObserver = addResizeMutationObserver(element, fn);
@@ -130,7 +130,7 @@
 			};
 		}
 	};
-	
+
 	function removeResizeListener(element, fn){
 		if (is_above_ie10 && supports_mutation_observer) {
 			var index = $.inArray(fn, element._mutationObservers);
@@ -156,5 +156,5 @@
 			if(!supports_onresize) element.removeEventListener('resize', fn);
 		}
 	};
-	
+
 }( jQuery ));
