@@ -10,10 +10,15 @@
 (function ( $ ) {
 	var is_above_ie10 = !(window.ActiveXObject) && "ActiveXObject" in window;
 	var supports_mutation_observer = 'MutationObserver' in window;
-
+	
+	var jQuery_resize = $.fn.resize;
+	
 	$.fn.resize = function(callback) {
 		return this.each(function() {
-			addResizeListener(this, callback);
+			if(this == window)
+				jQuery_resize.call(jQuery(this), callback);
+			else
+				addResizeListener(this, callback);
 		});
 	}
 
