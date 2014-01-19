@@ -4,7 +4,9 @@ javascript-detect-element-resize
 A Cross-Browser, Event-based, Element Resize Detection.
 
 In short, this implementation does NOT use an internal timer to detect size changes (as most implementations I found do).
-It uses [MutationObservers][4] if supported by the browser, and [overflow and underflow events][2] if not. It also uses the ['onresize' event][5] on IE10 and below.
+It uses [overflow and underflow events][2] on most browsers, and the ['onresize' event][5] on IE10 and below.
+
+NOTE: On IE11, due to lack of support for the above events, it only detects changes through a MutationObserver; i.e. only javascript generated resize changes and not CSS pseudo classes e.g. :hover, CSS animations, etc.
 
 About the libraries
 ===================
@@ -79,6 +81,11 @@ TODO
 
 Release Notes
 =============
+v0.4.1
+----
+
+ - Fix for jQuery 'resize' method overlapping
+
 v0.4
 ----
 
