@@ -73,7 +73,7 @@
     };
 
 	function addResizeListener(element, fn){
-		if (is_above_ie10 && supports_mutation_observer) {
+		if (is_above_ie10 && supports_mutation_observer || supports_mutation_observer) {
 			fn._mutationObserver = addResizeMutationObserver(element, fn);
 			var events = element._mutationObservers || (element._mutationObservers = []);
 			if ($.inArray(fn, events) == -1) events.push(fn);
@@ -132,7 +132,7 @@
 	};
 
 	function removeResizeListener(element, fn){
-		if (is_above_ie10 && supports_mutation_observer) {
+		if (is_above_ie10 && supports_mutation_observer || supports_mutation_observer) {
 			var index = $.inArray(fn, element._mutationObservers);
 			if (index > -1) {
 				var observer = element._mutationObservers[index]._mutationObserver;
