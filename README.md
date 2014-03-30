@@ -4,9 +4,9 @@ javascript-detect-element-resize
 A Cross-Browser, Event-based, Element Resize Detection.
 
 In short, this implementation does NOT use an internal timer to detect size changes (as most implementations I found do).
-It uses [overflow and underflow events][2] on most browsers, and the ['onresize' event][5] on IE10 and below.
+It uses `scroll` events on most browsers, and the [`onresize` event][5] on IE10 and below.
 
-NOTE: On IE11, due to lack of support for the above events, it only detects changes through a MutationObserver; i.e. only javascript generated resize changes and not CSS pseudo classes e.g. :hover, CSS animations, etc.
+The method used not only detects javascript generated resize changes but also changes made from CSS pseudo classes e.g. :hover, CSS animations, etc.
 
 About the libraries
 ===================
@@ -15,11 +15,9 @@ I was searching for a library that allowed me to detect when an DOM element chan
  1. only available as jQuery libraries (so no standalone Javascript)
  2. all had terrible performance (because all of them use timers to intermittently poll the size of the elements to detect a change).
 
-Then I came across this [great post][1] on [Back Alley Coder][3] about using [overflow and underflow events][2] to do event-based element resize detection; and it works great without consuming resources at all (just like any other browser originated event).
+Then I came across this [great post][1] on [Back Alley Coder][3] about using ~~[overflow and underflow events][2]~~ [`scroll` events][2] to do event-based element resize detection; and it works great without consuming resources at all (just like any other browser originated event).
 
-On the other hand, most new browsers implement [WC3 DOM4 MutationObservers][4], which allows to observe property changes and hence indirectly watch for resize changes.
-
-The libraries on this repository are just a concrete implementation of a mixture of the above technologies/techniques.
+The libraries on this repository are just a ready-to-use implementation of the above, one pure javascript and the other a jQuery plugin version (just for convenience).
 
 Libraries
 =========
@@ -60,12 +58,7 @@ Works great on:
 
  - Chrome
  - Firefox
- - IE 10 and below (tested on 10, 9, 8 and 7)
-
-Works but limited:
-
- - IE 11: due to lack of onresize/overflow events, it only detects changes through a MutationObserver;  
-   i.e. only javascript generated resize changes and not CSS pseudo classes e.g. :hover, CSS animations, etc.
+ - IE 11 and below (tested on 11, 10, 9, 8 and 7)
 
 Doesn't work on:
 
@@ -81,10 +74,16 @@ TODO
 
 Release Notes
 =============
+v0.5
+----
+
+ - It is now fully compatible with IE11.
+ - Rework of the libraries using the new scroll-event-based code of [Back Alley Coder][1]. For the pure javascript version I pretty much used the original code from [Back Alley Coder][1] and only had to add code to dynamically insert the styling for the resize-triggers.
+
 v0.4.1
 ----
 
- - Fix for jQuery 'resize' method overlapping
+ - Fix for jQuery 'resize' method overlapping.
 
 v0.4
 ----
@@ -106,8 +105,8 @@ v0.2
 v0.1
 ----
 
- - Implementation based on the [works][1] of [Back Alley Coder][3]
- - Adds jQuery plugin version
+ - Implementation based on the [works][1] of [Back Alley Coder][3].
+ - Adds jQuery plugin version.
 
 
 References
@@ -132,3 +131,4 @@ External links
 [3]: http://www.backalleycoder.com/
 [4]: http://www.w3.org/TR/dom/#mutation-observers
 [5]: http://msdn.microsoft.com/en-us/library/ie/ms536959
+

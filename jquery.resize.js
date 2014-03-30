@@ -4,12 +4,12 @@
 * https://github.com/sdecima/javascript-detect-element-resize
 * Sebastian Decima
 *
-* version: 0.4.1
+* version: 0.5
 **/
 
 (function ( $ ) {
-	var is_above_ie10 = !(window.ActiveXObject) && "ActiveXObject" in window;
-	var supports_mutation_observer = 'MutationObserver' in window;
+	var attachEvent = document.attachEvent,
+		stylesCreated = false;
 	
 	var jQuery_resize = $.fn.resize;
 	
@@ -27,139 +27,98 @@
 			removeResizeListener(this, callback);
 		});
 	}
+	
+	if (!attachEvent) {
+		var requestFrame = (function(){
+			var raf = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame ||
+								function(fn){ return window.setTimeout(fn, 20); };
+			return function(fn){ return raf(fn); };
+		})();
+		
+		var cancelFrame = (function(){
+			var cancel = window.cancelAnimationFrame || window.mozCancelAnimationFrame || window.webkitCancelAnimationFrame ||
+								   window.clearTimeout;
+		  return function(id){ return cancel(id); };
+		})();
 
-	$.fn.flow = function(type, callback) {
-		return this.each(function() {
-			addFlowListener(this, type, callback);
-		});
-	}
+		function resetTriggers(element){
+			var triggers = element.__resizeTriggers__,
+				expand = triggers.firstElementChild,
+				contract = triggers.lastElementChild,
+				expandChild = expand.firstElementChild;
+			contract.scrollLeft = contract.scrollWidth;
+			contract.scrollTop = contract.scrollHeight;
+			expandChild.style.width = expand.offsetWidth + 1 + 'px';
+			expandChild.style.height = expand.offsetHeight + 1 + 'px';
+			expand.scrollLeft = expand.scrollWidth;
+			expand.scrollTop = expand.scrollHeight;
+		};
 
-	function addFlowListener(element, type, fn){
-		var flow = type == 'over';
-		element.addEventListener('OverflowEvent' in window ? 'overflowchanged' : type + 'flow', function(e){
-			if (e.type == (type + 'flow') ||
-			((e.orient == 0 && e.horizontalOverflow == flow) ||
-			(e.orient == 1 && e.verticalOverflow == flow) ||
-			(e.orient == 2 && e.horizontalOverflow == flow && e.verticalOverflow == flow))) {
-				e.flow = type;
-				return fn.call(this, e);
-			}
-		}, false);
-	};
-
-	function newResizeMutationObserverCallback(element, fn) {
-		var oldWidth = element.clientWidth,
-			oldHeight = element.clientHeight;
-		return function() {
-			if(oldWidth != element.clientWidth || oldHeight != element.clientHeight) {
-				oldWidth = element.clientWidth;
-				oldHeight = element.clientHeight;
-				fn.call(element);
-			}
+		function checkTriggers(element){
+			return element.offsetWidth != element.__resizeLast__.width ||
+						 element.offsetHeight != element.__resizeLast__.height;
 		}
-	}
-
-	function addResizeMutationObserver(element, fn){
-		var observer = new MutationObserver(newResizeMutationObserverCallback(element, fn));
-		observer.observe(element, {
-			attributes: true,
-			subtree: true,
-			attributeFilter: ['style']
-		});
-		return observer;
-	};
-
-	function fireEvent(element, type, data, options){
-		var options = options || {},
-			event = document.createEvent('Event');
-		event.initEvent(type, 'bubbles' in options ? options.bubbles : true, 'cancelable' in options ? options.cancelable : true);
-		for (var z in data) event[z] = data[z];
-		element.dispatchEvent(event);
-    };
-
-	function addResizeListener(element, fn){
-		if (is_above_ie10 && supports_mutation_observer) {
-			fn._mutationObserver = addResizeMutationObserver(element, fn);
-			var events = element._mutationObservers || (element._mutationObservers = []);
-			if ($.inArray(fn, events) == -1) events.push(fn);
-		} else {
-			var supports_onresize = 'onresize' in element;
-			if (!supports_onresize && !element._resizeSensor) {
-				var sensor_style = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; z-index: -1;';
-				var sensor = element._resizeSensor = document.createElement('div');
-					sensor.className = 'resize-sensor';
-					sensor.innerHTML = '<div class="resize-overflow" style="' + sensor_style
-						+ '"><div></div></div><div class="resize-underflow" style="' + sensor_style
-						+ '"><div></div></div>';
-				
-				var x = 0, y = 0,
-					first = sensor.firstElementChild.firstChild,
-					last = sensor.lastElementChild.firstChild,
-					matchFlow = function(event){
-						var change = false,
-							width = element.offsetWidth;
-						if (x != width) {
-							first.style.width = width - 1 + 'px';	
-							last.style.width = width + 1 + 'px';
-							change = true;
-							x = width;
-						}
-						var height = element.offsetHeight;
-						if (y != height) {
-							first.style.height = height - 1 + 'px';
-							last.style.height = height + 1 + 'px';	
-							change = true;
-							y = height;
-						}
-						if (change && event.currentTarget != element) fireEvent(element, 'resize');
-					};
-				
-				if (getComputedStyle(element).position == 'static'){
-					element.style.position = 'relative';
-					element._resizeSensor._resetPosition = true;
+		
+		function scrollListener(e){
+			var element = this;
+			resetTriggers(this);
+			if (this.__resizeRAF__) cancelFrame(this.__resizeRAF__);
+			this.__resizeRAF__ = requestFrame(function(){
+				if (checkTriggers(element)) {
+					element.__resizeLast__.width = element.offsetWidth;
+					element.__resizeLast__.height = element.offsetHeight;
+					element.__resizeListeners__.forEach(function(fn){
+						fn.call(element, e);
+					});
 				}
-				addFlowListener(sensor, 'over', matchFlow);
-				addFlowListener(sensor, 'under', matchFlow);
-				addFlowListener(sensor.firstElementChild, 'over', matchFlow);
-				addFlowListener(sensor.lastElementChild, 'under', matchFlow);	
-				element.appendChild(sensor);
-				matchFlow({});
+			});
+		};
+	}
+	
+	function createStyles() {
+		if (!stylesCreated) {
+			var css = '.resize-triggers { visibility: hidden; } .resize-triggers, .resize-triggers > div, .contract-trigger:before { content: \" \"; display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; } .resize-triggers > div { background: #eee; overflow: auto; } .contract-trigger:before { width: 200%; height: 200%; }',
+				head = document.head || document.getElementsByTagName('head')[0],
+				style = document.createElement('style');
+			
+			style.type = 'text/css';
+			if (style.styleSheet) {
+				style.styleSheet.cssText = css;
+			} else {
+				style.appendChild(document.createTextNode(css));
 			}
-			var events = element._flowEvents || (element._flowEvents = []);
-			if ($.inArray(fn,events) == -1) events.push(fn);
-			if (!supports_onresize) element.addEventListener('resize', fn, false);
-			element.onresize = function(e){
-				$.each(events, function(index, fn){
-					fn.call(element, e);
-				});
-			};
+
+			head.appendChild(style);
+		}
+	}
+	
+	window.addResizeListener = function(element, fn){
+		if (attachEvent) element.attachEvent('onresize', fn);
+		else {
+			if (!element.__resizeTriggers__) {
+				if (getComputedStyle(element).position == 'static') element.style.position = 'relative';
+				createStyles();
+				element.__resizeLast__ = {};
+				element.__resizeListeners__ = [];
+				(element.__resizeTriggers__ = document.createElement('div')).className = 'resize-triggers';
+				element.__resizeTriggers__.innerHTML = '<div class="expand-trigger"><div></div></div>' +
+																						   '<div class="contract-trigger"></div>';
+				element.appendChild(element.__resizeTriggers__);
+				resetTriggers(element);
+				element.addEventListener('scroll', scrollListener, true);
+			}
+			element.__resizeListeners__.push(fn);
 		}
 	};
-
-	function removeResizeListener(element, fn){
-		if (is_above_ie10 && supports_mutation_observer) {
-			var index = $.inArray(fn, element._mutationObservers);
-			if (index > -1) {
-				var observer = element._mutationObservers[index]._mutationObserver;
-				element._mutationObservers.splice(index, 1);
-				observer.disconnect();
+	
+	window.removeResizeListener = function(element, fn){
+		if (attachEvent) element.detachEvent('resize', fn);
+		else {
+			element.__resizeListeners__.splice(element.__resizeListeners__.indexOf(fn), 1);
+			if (!element.__resizeListeners__.length) {
+					element.removeEventListener('scroll', scrollListener);
+					element.__resizeTriggers__ = !element.removeChild(element.__resizeTriggers__);
 			}
-		} else {
-			var supports_onresize = 'onresize' in element;
-			var index = $.inArray(fn, element._flowEvents);
-			if (index > -1) element._flowEvents.splice(index, 1);
-			if (!element._flowEvents.length) {
-				var sensor = element._resizeSensor;
-				if (sensor) {
-					element.removeChild(sensor);
-					if (sensor._resetPosition) element.style.position = 'static';
-					try { delete element._resizeSensor; } catch(e) { /* delete arrays not supported on IE 7 and below */}
-				}
-				if (supports_onresize) element.onresize = null;
-				try { delete element._flowEvents; } catch(e) { /* delete arrays not supported on IE 7 and below */}
-			}
-			if(!supports_onresize) element.removeEventListener('resize', fn);
 		}
-	};
-
+	}
 }( jQuery ));
