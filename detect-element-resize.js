@@ -76,7 +76,7 @@
 	}
 	
 	window.addResizeListener = function(element, fn){
-		if (attachEvent) element.attachEvent('resize', fn);
+		if (attachEvent) element.attachEvent('onresize', fn);
 		else {
 			if (!element.__resizeTriggers__) {
 				if (getComputedStyle(element).position == 'static') element.style.position = 'relative';
@@ -95,7 +95,7 @@
 	};
 	
 	window.removeResizeListener = function(element, fn){
-		if (attachEvent) element.detachEvent('resize', fn);
+		if (attachEvent) element.detachEvent('onresize', fn);
 		else {
 			element.__resizeListeners__.splice(element.__resizeListeners__.indexOf(fn), 1);
 			if (!element.__resizeListeners__.length) {
