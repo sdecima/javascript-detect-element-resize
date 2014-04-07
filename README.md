@@ -74,6 +74,11 @@ TODO
 
 Release Notes
 =============
+v0.5.1
+------
+
+ - Fix for resize event on IE
+
 v0.5
 ----
 
