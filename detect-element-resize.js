@@ -25,8 +25,9 @@
 		})();
 
 		function resetTriggers(element){
-			var triggers = element.__resizeTriggers__,
-				expand = triggers.firstElementChild,
+			var triggers = element.__resizeTriggers__;
+			if( !triggers ) return;
+			var expand = triggers.firstElementChild,
 				contract = triggers.lastElementChild,
 				expandChild = expand.firstElementChild;
 			contract.scrollLeft = contract.scrollWidth;
@@ -35,6 +36,13 @@
 			expandChild.style.height = expand.offsetHeight + 1 + 'px';
 			expand.scrollLeft = expand.scrollWidth;
 			expand.scrollTop = expand.scrollHeight;
+			if( contract.scrollTop == 0 || contract.scrollLeft == 0 )
+			{
+				clearTimeout(triggers.resetTimeout);
+				var reset = function(){ resetTriggers(element); }
+				var getFrame = function(){ requestFrame(reset); } /*Performance*/
+				triggers.resetTimeout = setTimeout( getFrame,1000);
+			}
 		};
 
 		function checkTriggers(element){
