@@ -89,6 +89,7 @@
 			}
 
 			head.appendChild(style);
+			stylesCreated = true;
 		}
 	}
 	
