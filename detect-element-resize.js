@@ -60,7 +60,14 @@
 	
 	function createStyles() {
 		if (!stylesCreated) {
-			var css = '.resize-triggers { visibility: hidden; } .resize-triggers, .resize-triggers > div, .contract-trigger:before { content: \" \"; display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; } .resize-triggers > div { background: #eee; overflow: auto; } .contract-trigger:before { width: 200%; height: 200%; }',
+			// Add styles to detect when the dom node is added, via animation events
+			var prefices = ['-moz-', '-webkit-', '-ms-', '-o-', ''];
+			var declaration = 'keyframes nodeInserted { from {outline-color: rgba(255,255,255,.1);} to {outline-color: rgba(255,255,255,0);}}';
+			var keyframes = '@' + prefices.join(declaration + '@') + declaration;
+			var animationDeclaration = 'animation: nodeInserted .01s;';
+			var animation = prefices.join(animationDeclaration) + animationDeclaration;
+
+			var css = keyframes + '.resize-triggers { visibility: hidden;' + animation + ' } .resize-triggers, .resize-triggers > div, .contract-trigger:before { content: \" \"; display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; } .resize-triggers > div { background: #eee; overflow: auto; } .contract-trigger:before { width: 200%; height: 200%; }',
 				head = document.head || document.getElementsByTagName('head')[0],
 				style = document.createElement('style');
 			
@@ -72,6 +79,7 @@
 			}
 
 			head.appendChild(style);
+			stylesCreated = true;
 		}
 	}
 	
@@ -89,6 +97,17 @@
 				element.appendChild(element.__resizeTriggers__);
 				resetTriggers(element);
 				element.addEventListener('scroll', scrollListener, true);
+
+				// When the node is detached, the scrolls reset to 0. So, when the node is inserted again,
+				// reset them back
+				function resetOnInsert(e) {
+					if (e.animationName === 'nodeInserted') {
+						resetTriggers(element);
+					}
+				}
+				element.addEventListener('animationstart', resetOnInsert, true);
+				element.addEventListener('MSAnimationStart', resetOnInsert, true);
+				element.addEventListener('webkitAnimationStart', resetOnInsert, true);
 			}
 			element.__resizeListeners__.push(fn);
 		}
