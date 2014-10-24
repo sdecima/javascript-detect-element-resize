@@ -74,6 +74,13 @@ TODO
 
 Release Notes
 =============
+v0.5.2
+------
+
+ - Adding a bower.json file (thanks @adamjcook)
+ - Fix style being appended to head multiple times (thanks @thomassuckow and @progman32)
+ - Work around a chrome bug that would show scrollbars in some cases (thanks @thomassuckow)
+
 v0.5.1
 ------
 

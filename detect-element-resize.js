@@ -4,7 +4,7 @@
 * https://github.com/sdecima/javascript-detect-element-resize
 * Sebastian Decima
 *
-* version: 0.5
+* version: 0.5.2
 **/
 
 (function () {
