@@ -60,6 +60,10 @@ Works great on:
  - Firefox
  - IE 11 and below (tested on 11, 10, 9, 8 and 7)
 
+Known Issues:
+
+ - On IE 10 and below: If you detach the element and re-attach it, you will need to add the resize listener again.
+
 Doesn't work on:
 
  - ???
@@ -69,11 +73,18 @@ Please [let me know](https://github.com/sdecima/javascript-detect-element-resize
 TODO
 ====
 
+ - Fix detach/re-attach issue on IE 10 and below (IE 9 and below doesn't support CSS animations so we can use those as in the rest of the browsers).
  - Create minified version of the libraries.
  - Add support for standard jQuery bind method on 'resize' event.
 
 Release Notes
 =============
+v0.5.3
+------
+
+ - Fix for when the element is inside a display:none, and for when it is detached and reattached (changed @thomassuckow and @jerjou fixes to properly use CSS animations)
+ - Adding /tests/ with some general QUnit tests to help test on multiple browsers
+
 v0.5.2
 ------
 
