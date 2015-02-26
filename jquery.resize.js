@@ -7,7 +7,14 @@
 * version: 0.5.3
 **/
 
-(function ( $ ) {
+// UMD dance:  github.com/umdjs/umd
+(function (factory) {
+    if (typeof define === 'function' && define.amd) {
+        define(['jquery'], factory);
+    } else {
+        factory(jQuery);
+    }
+}(function ($) {
 	var attachEvent = document.attachEvent,
 		stylesCreated = false;
 	
@@ -161,4 +168,4 @@
 			}
 		}
 	}
-}( jQuery ));
+}));
