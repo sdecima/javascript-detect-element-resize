@@ -35,7 +35,7 @@
 			expandChild.style.height = expand.offsetHeight + 1 + 'px';
 			expand.scrollLeft = expand.scrollWidth;
 			expand.scrollTop = expand.scrollHeight;
-		};
+		}
 
 		function checkTriggers(element){
 			return element.offsetWidth != element.__resizeLast__.width ||
@@ -124,11 +124,17 @@
 				resetTriggers(element);
 				element.addEventListener('scroll', scrollListener, true);
 				
-				/* Listen for a css animation to detect element display/re-attach */
-				animationstartevent && element.__resizeTriggers__.addEventListener(animationstartevent, function(e) {
-					if(e.animationName == animationName)
-						resetTriggers(element);
-				});
+
+        if (animationstartevent) {
+				  /* Listen for a css animation to detect element display/re-attach */
+          var animationStartListener = function(e) {
+            if(e.animationName == animationName) {
+          	  resetTriggers(element);
+            }
+          };
+          element.__resizeTriggers__.animationStartListener = animationStartListener;
+				  element.__resizeTriggers__.addEventListener(animationstartevent, animationStartListener);
+        }
 			}
 			element.__resizeListeners__.push(fn);
 		}
@@ -140,6 +146,7 @@
 			element.__resizeListeners__.splice(element.__resizeListeners__.indexOf(fn), 1);
 			if (!element.__resizeListeners__.length) {
 					element.removeEventListener('scroll', scrollListener);
+          element.__resizeTriggers__.removeEventListener(animationstartevent, element.__resizeTriggers__.animationStartListener);
 					element.__resizeTriggers__ = !element.removeChild(element.__resizeTriggers__);
 			}
 		}
