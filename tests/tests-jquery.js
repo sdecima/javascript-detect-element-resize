@@ -10,7 +10,7 @@ QUnit.module('main', {
     content = document.getElementById('content');
 
     $('#container').hide();
-    $(element).resize(detectCallback);
+    $(element).on('resize', detectCallback);
     $('#container').show();
     shouldDetect = true;
     detected = false;
@@ -18,7 +18,7 @@ QUnit.module('main', {
   teardown: function() {
     $('#styleTest').remove();
     try {
-      $(element).removeResize(detectCallback);
+      $(element).off('resize', detectCallback);
     } catch(e) {}
   }
 });
@@ -81,7 +81,7 @@ QUnit.asyncTest( "JS removeResizeListener test", function( assert ) {
   newWidth = 0;
   shouldDetect = false;
   
-  $(element).removeResize(detectCallback);
+  $(element).off('resize', detectCallback);
   
   $(content).width(newWidth);
   $(content).height(0);

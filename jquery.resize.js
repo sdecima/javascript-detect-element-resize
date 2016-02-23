@@ -11,22 +11,48 @@
 	var attachEvent = document.attachEvent,
 		stylesCreated = false;
 	
-	var jQuery_resize = $.fn.resize;
-	
-	$.fn.resize = function(callback) {
-		return this.each(function() {
-			if(this == window)
-				jQuery_resize.call(jQuery(this), callback);
-			else
-				addResizeListener(this, callback);
+	function installResizeListener($el) {
+		$el.each(function () {
+			var installed = this.__resizeListeners__
+							&& this.__resizeListeners__.indexOf(triggerResizeListener) !== -1;
+
+			if (this !== window && !installed) {
+				addResizeListener(this, triggerResizeListener);
+			}
 		});
 	}
 
-	$.fn.removeResize = function(callback) {
-		return this.each(function() {
-			removeResizeListener(this, callback);
-		});
+	function triggerResizeListener() {
+		var element = this;
+
+		$(element).triggerHandler('resize');
 	}
+
+	var resizeRegTest = /\bresize\b/;
+	var jQuery_on = $.fn.on;
+	var jQuery_one = $.fn.one;
+
+	$.fn.on = function() {
+		var types = arguments[0];
+
+		if (resizeRegTest.test(types)) {
+			installResizeListener(this);
+		}
+		return jQuery_on.apply(this, arguments);
+	};
+
+	$.fn.one = function() {
+		var types = arguments[0];
+
+		if (resizeRegTest.test(types)) {
+			installResizeListener(this);
+		}
+		return jQuery_one.apply(this, arguments);
+	};
+	// compatibility for v0.5.3 and below
+	$.fn.removeResize = function(callback) {
+		return $.fn.off.apply(this, ['resize', callback]);
+	};
 	
 	if (!attachEvent) {
 		var requestFrame = (function(){
@@ -52,7 +78,7 @@
 			expandChild.style.height = expand.offsetHeight + 1 + 'px';
 			expand.scrollLeft = expand.scrollWidth;
 			expand.scrollTop = expand.scrollHeight;
-		};
+		}
 
 		function checkTriggers(element){
 			return element.offsetWidth != element.__resizeLast__.width ||
@@ -72,7 +98,7 @@
 					});
 				}
 			});
-		};
+		}
 		
 		/* Detect CSS Animations support to detect element display/re-attach */
 		var animation = false,
@@ -160,5 +186,5 @@
 					element.__resizeTriggers__ = !element.removeChild(element.__resizeTriggers__);
 			}
 		}
-	}
+	};
 }( jQuery ));

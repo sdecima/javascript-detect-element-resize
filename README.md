@@ -47,8 +47,10 @@ jQuery plugin library usage
     /* do something */
   };
   
-  $('#resizeElement').resize(myFunc);
-  $('#resizeElement').removeResize(myFunc);
+  $('#resizeElement').on('resize', myFunc);
+  // or
+  // $('#resizeElement').resize(myFunc);
+  $('#resizeElement').off('resize', myFunc);
 </script>
 ```
 
@@ -75,7 +77,6 @@ TODO
 
  - Fix detach/re-attach issue on IE 10 and below (IE 9 and below doesn't support CSS animations so we can use those as in the rest of the browsers).
  - Create minified version of the libraries.
- - Add support for standard jQuery bind method on 'resize' event.
 
 Release Notes
 =============
