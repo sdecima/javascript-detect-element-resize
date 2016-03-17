@@ -23,39 +23,6 @@
 								   window.clearTimeout;
 		  return function(id){ return cancel(id); };
 		})();
-
-		function resetTriggers(element){
-			var triggers = element.__resizeTriggers__,
-				expand = triggers.firstElementChild,
-				contract = triggers.lastElementChild,
-				expandChild = expand.firstElementChild;
-			contract.scrollLeft = contract.scrollWidth;
-			contract.scrollTop = contract.scrollHeight;
-			expandChild.style.width = expand.offsetWidth + 1 + 'px';
-			expandChild.style.height = expand.offsetHeight + 1 + 'px';
-			expand.scrollLeft = expand.scrollWidth;
-			expand.scrollTop = expand.scrollHeight;
-		};
-
-		function checkTriggers(element){
-			return element.offsetWidth != element.__resizeLast__.width ||
-						 element.offsetHeight != element.__resizeLast__.height;
-		}
-		
-		function scrollListener(e){
-			var element = this;
-			resetTriggers(this);
-			if (this.__resizeRAF__) cancelFrame(this.__resizeRAF__);
-			this.__resizeRAF__ = requestFrame(function(){
-				if (checkTriggers(element)) {
-					element.__resizeLast__.width = element.offsetWidth;
-					element.__resizeLast__.height = element.offsetHeight;
-					element.__resizeListeners__.forEach(function(fn){
-						fn.call(element, e);
-					});
-				}
-			});
-		};
 		
 		/* Detect CSS Animations support to detect element display/re-attach */
 		var animation = false,
@@ -87,6 +54,39 @@
 		var animationKeyframes = '@' + keyframeprefix + 'keyframes ' + animationName + ' { from { opacity: 0; } to { opacity: 0; } } ';
 		var animationStyle = keyframeprefix + 'animation: 1ms ' + animationName + '; ';
 	}
+	
+	function resetTriggers(element){
+		var triggers = element.__resizeTriggers__,
+			expand = triggers.firstElementChild,
+			contract = triggers.lastElementChild,
+			expandChild = expand.firstElementChild;
+		contract.scrollLeft = contract.scrollWidth;
+		contract.scrollTop = contract.scrollHeight;
+		expandChild.style.width = expand.offsetWidth + 1 + 'px';
+		expandChild.style.height = expand.offsetHeight + 1 + 'px';
+		expand.scrollLeft = expand.scrollWidth;
+		expand.scrollTop = expand.scrollHeight;
+	};
+
+	function checkTriggers(element){
+		return element.offsetWidth != element.__resizeLast__.width ||
+			 element.offsetHeight != element.__resizeLast__.height;
+	}
+	
+	function scrollListener(e){
+		var element = this;
+		resetTriggers(this);
+		if (this.__resizeRAF__) cancelFrame(this.__resizeRAF__);
+		this.__resizeRAF__ = requestFrame(function(){
+			if (checkTriggers(element)) {
+				element.__resizeLast__.width = element.offsetWidth;
+				element.__resizeLast__.height = element.offsetHeight;
+				element.__resizeListeners__.forEach(function(fn){
+					fn.call(element, e);
+				});
+			}
+		});
+	};
 	
 	function createStyles() {
 		if (!stylesCreated) {
