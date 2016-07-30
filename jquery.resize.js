@@ -20,13 +20,13 @@
 			else
 				addResizeListener(this, callback);
 		});
-	}
+	};
 
 	$.fn.removeResize = function(callback) {
 		return this.each(function() {
 			removeResizeListener(this, callback);
 		});
-	}
+	};
 	
 	if (!attachEvent) {
 		var requestFrame = (function(){
