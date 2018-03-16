@@ -20,13 +20,13 @@
 			else
 				addResizeListener(this, callback);
 		});
-	}
+	};
 
 	$.fn.removeResize = function(callback) {
 		return this.each(function() {
 			removeResizeListener(this, callback);
 		});
-	}
+	};
 	
 	if (!attachEvent) {
 		var requestFrame = (function(){
@@ -52,7 +52,7 @@
 			expandChild.style.height = expand.offsetHeight + 1 + 'px';
 			expand.scrollLeft = expand.scrollWidth;
 			expand.scrollTop = expand.scrollHeight;
-		};
+		}
 
 		function checkTriggers(element){
 			return element.offsetWidth != element.__resizeLast__.width ||
@@ -72,7 +72,7 @@
 					});
 				}
 			});
-		};
+		}
 		
 		/* Detect CSS Animations support to detect element display/re-attach */
 		var animation = false,
@@ -88,11 +88,11 @@
 			
 			if( animation === false ) {
 				for( var i = 0; i < domPrefixes.length; i++ ) {
-					if( elm.style[ domPrefixes[i] + 'AnimationName' ] !== undefined ) {
-						pfx = domPrefixes[ i ];
+					if( elm.style[ domPrefixes[i] + 'AnimationName'] !== undefined) {
+						pfx = domPrefixes[i];
 						animationstring = pfx + 'Animation';
 						keyframeprefix = '-' + pfx.toLowerCase() + '-';
-						animationstartevent = startEvents[ i ];
+						animationstartevent = startEvents[i];
 						animation = true;
 						break;
 					}
@@ -125,7 +125,7 @@
 			stylesCreated = true;
 		}
 	}
-	
+
 	window.addResizeListener = function(element, fn){
 		if (attachEvent) element.attachEvent('onresize', fn);
 		else {
@@ -140,12 +140,17 @@
 				element.appendChild(element.__resizeTriggers__);
 				resetTriggers(element);
 				element.addEventListener('scroll', scrollListener, true);
-				
+
 				/* Listen for a css animation to detect element display/re-attach */
-				animationstartevent && element.__resizeTriggers__.addEventListener(animationstartevent, function(e) {
-					if(e.animationName == animationName)
-						resetTriggers(element);
-				});
+				if (animationstartevent) {
+					element.__resizeTriggers__.animationStartListener = function (e) {
+						if (e.animationName == animationName) {
+							resetTriggers(element);
+						}
+					}
+
+					element.__resizeTriggers__.addEventListener(animationstartevent, element.__resizeTriggers__.animationStartListener);
+				}
 			}
 			element.__resizeListeners__.push(fn);
 		}
@@ -156,9 +161,12 @@
 		else {
 			element.__resizeListeners__.splice(element.__resizeListeners__.indexOf(fn), 1);
 			if (!element.__resizeListeners__.length) {
-					element.removeEventListener('scroll', scrollListener);
-					element.__resizeTriggers__ = !element.removeChild(element.__resizeTriggers__);
+				element.removeEventListener('scroll', scrollListener, true);
+				if (animationstartevent) {
+				element.__resizeTriggers__.removeEventListener(animationstartevent, element.__resizeTriggers__.animationStartListener);
+				}
+				element.__resizeTriggers__ = !element.removeChild(element.__resizeTriggers__);
 			}
 		}
-	}
+	};
 }( jQuery ));
