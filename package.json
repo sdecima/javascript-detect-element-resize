@@ -2,7 +2,7 @@
   "name": "javascript-detect-element-resize",
   "version": "0.5.3",
   "description": "A Cross-Browser, Event-based, Element Resize Detection",
-  "main": "detect-element-resize.js",
+  "main": "detect-element-resize.es6.js",
   "directories": {
     "test": "tests"
   },

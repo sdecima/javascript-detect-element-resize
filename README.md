@@ -52,6 +52,20 @@ jQuery plugin library usage
 </script>
 ```
 
+ES6 module usage
+----------------
+```javascript
+import Resize from 'detect-element-resize';
+
+var resizeElement = document.getElementById('resizeElement'),
+    resizeCallback = function() {
+        /* do something */
+    };
+
+Resize.addResizeListener(resizeElement, resizeCallback);
+Resize.removeResizeListener(resizeElement, resizeCallback);
+```
+
 Compatibility
 -------------
 Works great on:

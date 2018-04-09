@@ -35,7 +35,7 @@
 			expandChild.style.height = expand.offsetHeight + 1 + 'px';
 			expand.scrollLeft = expand.scrollWidth;
 			expand.scrollTop = expand.scrollHeight;
-		};
+		}
 
 		function checkTriggers(element){
 			return element.offsetWidth != element.__resizeLast__.width ||
@@ -55,7 +55,7 @@
 					});
 				}
 			});
-		};
+		}
 		
 		/* Detect CSS Animations support to detect element display/re-attach */
 		var animation = false,
@@ -71,11 +71,11 @@
 			
 			if( animation === false ) {
 				for( var i = 0; i < domPrefixes.length; i++ ) {
-					if( elm.style[ domPrefixes[i] + 'AnimationName' ] !== undefined ) {
-						pfx = domPrefixes[ i ];
+					if( elm.style[ domPrefixes[i] + 'AnimationName'] !== undefined) {
+						pfx = domPrefixes[i];
 						animationstring = pfx + 'Animation';
 						keyframeprefix = '-' + pfx.toLowerCase() + '-';
-						animationstartevent = startEvents[ i ];
+						animationstartevent = startEvents[i];
 						animation = true;
 						break;
 					}
@@ -93,7 +93,7 @@
 			//opacity:0 works around a chrome bug https://code.google.com/p/chromium/issues/detail?id=286360
 			var css = (animationKeyframes ? animationKeyframes : '') +
 					'.resize-triggers { ' + (animationStyle ? animationStyle : '') + 'visibility: hidden; opacity: 0; } ' +
-					'.resize-triggers, .resize-triggers > div, .contract-trigger:before { content: \" \"; display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; } .resize-triggers > div { background: #eee; overflow: auto; } .contract-trigger:before { width: 200%; height: 200%; }',
+					'.resize-triggers, .resize-triggers > div, .contract-trigger:before { content: \" \"; display: block; position: absolute; top: 0; left: 0; height: 100%; width: 100%; overflow: hidden; z-index: -1; } .resize-triggers > div { background: #eee; overflow: auto; } .contract-trigger:before { width: 200%; height: 200%; }',
 				head = document.head || document.getElementsByTagName('head')[0],
 				style = document.createElement('style');
 			
@@ -108,7 +108,7 @@
 			stylesCreated = true;
 		}
 	}
-	
+   
 	window.addResizeListener = function(element, fn){
 		if (attachEvent) element.attachEvent('onresize', fn);
 		else {
@@ -125,10 +125,15 @@
 				element.addEventListener('scroll', scrollListener, true);
 				
 				/* Listen for a css animation to detect element display/re-attach */
-				animationstartevent && element.__resizeTriggers__.addEventListener(animationstartevent, function(e) {
-					if(e.animationName == animationName)
-						resetTriggers(element);
-				});
+				if (animationstartevent) {
+					element.__resizeTriggers__.animationStartListener = function (e) {
+						if (e.animationName == animationName) {
+							resetTriggers(element);
+						}
+					}
+
+					element.__resizeTriggers__.addEventListener(animationstartevent, element.__resizeTriggers__.animationStartListener);
+				}
 			}
 			element.__resizeListeners__.push(fn);
 		}
@@ -139,9 +144,12 @@
 		else {
 			element.__resizeListeners__.splice(element.__resizeListeners__.indexOf(fn), 1);
 			if (!element.__resizeListeners__.length) {
-					element.removeEventListener('scroll', scrollListener);
-					element.__resizeTriggers__ = !element.removeChild(element.__resizeTriggers__);
+				element.removeEventListener('scroll', scrollListener, true);
+				if (animationstartevent) {
+					element.__resizeTriggers__.removeEventListener(animationstartevent, element.__resizeTriggers__.animationStartListener);
+				}
+				element.__resizeTriggers__ = !element.removeChild(element.__resizeTriggers__);
 			}
 		}
-	}
+	};
 })();
