@@ -137,6 +137,9 @@
 	window.removeResizeListener = function(element, fn){
 		if (attachEvent) element.detachEvent('onresize', fn);
 		else {
+			if (!element.__resizeListeners__) {
+				return;
+			}
 			element.__resizeListeners__.splice(element.__resizeListeners__.indexOf(fn), 1);
 			if (!element.__resizeListeners__.length) {
 					element.removeEventListener('scroll', scrollListener);
