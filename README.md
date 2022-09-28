@@ -1,6 +1,13 @@
 javascript-detect-element-resize
 ================================
 
+note: an onresize() is now working on all browsers , this project is absolut
+
+
+
+
+
+
 A Cross-Browser, Event-based, Element Resize Detection.
 
 In short, this implementation does NOT use an internal timer to detect size changes (as most implementations I found do).
