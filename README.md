@@ -15,7 +15,7 @@ I was searching for a library that allowed me to detect when an DOM element chan
  1. only available as jQuery libraries (so no standalone Javascript)
  2. all had terrible performance (because all of them use timers to intermittently poll the size of the elements to detect a change).
 
-Then I came across this [great post][1] on [Back Alley Coder][3] about using ~~[overflow and underflow events][2]~~ [`scroll` events][2] to do event-based element resize detection; and it works great without consuming resources at all (just like any other browser originated event).
+Then I came across this [great post][1] on [Back Alley Coder][3] about using ~~[overflow and underflow events][2]~~ [`scroll` events][1] to do event-based element resize detection; and it works great without consuming resources at all (just like any other browser originated event).
 
 The libraries on this repository are just a ready-to-use implementation of the above, one pure javascript and the other a jQuery plugin version (just for convenience).
 
